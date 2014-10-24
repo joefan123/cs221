@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 import random, collections, sys
 
-sys.path.append('../Homework/HW4/blackjack')
 import passproblem2
-import submission, util
+import algoMDP, util4
 
 def getMDP(scenario):
     if scenario == 0:   # close to AASHTO d2 distance for 60 mph
@@ -19,7 +18,7 @@ def runScenario():
         print
         print '~~~~~~~~~~ BEGIN scenario %d ~~~~~~~~~~' % (scenario)
         mdp = getMDP(scenario)
-        vi = submission.ValueIteration()
+        vi = algoMDP.ValueIteration()
         vi.solve(mdp)
         f = len([a for a in vi.pi.values() if a == 'Faster']) / float(len(vi.pi.values()))
         print '='*80

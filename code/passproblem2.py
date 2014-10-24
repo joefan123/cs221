@@ -3,12 +3,11 @@
 import sys
 import collections
 
-sys.path.append('../Homework/HW4/blackjack')
-import util
+import util4
 
 MPHtoFPS = 1.46667      # convert miles per hour to feet per second
 
-class PassingProblem2(util.MDP):
+class PassingProblem2(util4.MDP):
    
     # The problem is represented by the position of three vehicles on the 2-D grid.
     # State = (CarALane, dist(A,B), dist(A,T))
