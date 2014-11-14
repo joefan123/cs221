@@ -10,6 +10,7 @@ from engine.model.agentCommunication import AgentCommunication
 import threading
 import copy
 import util
+import random
 
 class Model(object):
 
@@ -22,8 +23,8 @@ class Model(object):
         startDirName = layout.getJuniorDir()
         self.junior = AutoDriver()
         self.junior.setup(
-            Vec2d(startX, startY), 
-            startDirName, 
+            Vec2d(startX, startY),
+            startDirName,
             Vec2d(0, 0)
         )
         self.cars = [self.junior]
@@ -31,12 +32,25 @@ class Model(object):
         self.finish = Block(layout.getFinish())
 
         agentComm = AgentCommunication()
-        agentGraph = layout.getAgentGraph()
-        for _ in range(Const.NUM_AGENTS):
-            startNode = self._getStartNode(agentGraph)
-            other = Agent(startNode, layout.getAgentGraph(), self, agentComm)
+        if self.layout.getWorldName() != 'highway':
+            agentGraph = layout.getAgentGraph()
+            for _ in range(Const.NUM_AGENTS):
+                startNode = self._getStartNode(agentGraph)
+                other = Agent(startNode, layout.getAgentGraph(), self, agentComm)
+                self.cars.append(other)
+                self.otherCars.append(other)
+        else:
+            agentGraphCarB = layout.getAgentGraphCarB()
+            startNode = self._getStartNode(agentGraphCarB)
+            other = Agent(startNode, layout.getAgentGraphCarB(), self, agentComm)
             self.cars.append(other)
-            self.otherCars.append(other)
+            self.otherCars.append(other)                
+            agentGraphTruck = layout.getAgentGraphTruck()
+            startNode = self._getStartNode(agentGraphTruck)
+            other = Agent(startNode, layout.getAgentGraphTruck(), self, agentComm)
+            self.cars.append(other)
+            self.otherCars.append(other)            
+            
         self.observations = []
         agentComm.addAgents(self.otherCars)
         self.modelLock = threading.Lock()
@@ -55,16 +69,20 @@ class Model(object):
             self.intersections.append(block)
             
     def _getStartNode(self, agentGraph):
-        while True:
-            node = agentGraph.getRandomNode()
-            pos = node.getPos()
-            alreadyChosen = False
-            for car in self.otherCars:
-                if car.getPos() == pos:
-                    alreadyChosen = True
-                    break
-            if not alreadyChosen: 
-                return node
+        if self.layout.getWorldName()!='highway':
+            while True:
+                node = agentGraph.getRandomNode()
+                pos = node.getPos()
+                alreadyChosen = False
+                for car in self.otherCars:
+                    if car.getPos() == pos:
+                        alreadyChosen = True
+                        break
+                if not alreadyChosen: 
+                    return node
+        else:
+            return agentGraph.getRandomStartNode()
+                
             
     def checkVictory(self):
         bounds = self.junior.getBounds()

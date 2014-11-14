@@ -11,11 +11,13 @@ import random
 
 class AgentGraph(object):
     
-    def __init__(self, data):
+    def __init__(self, data, startNodes=None):
         self.nodeMap = {}
         self.pathGraph = {}
         self.loadNodes(data)
         self.loadPath(data)
+        if startNodes != None:
+            self.startNodes = startNodes
         
     def add(self, moreData):
         self.loadNodes(moreData)
@@ -40,7 +42,7 @@ class AgentGraph(object):
         c = self.getNode(nodeId).getPos()
         a = carPos
         b = carPos + carDir
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) < 0   
+        return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) < 0   
         
     def isTerminal(self, nodeId):
         return self.getNode(nodeId).isTerminal()
@@ -50,7 +52,7 @@ class AgentGraph(object):
         c = self.getNode(nodeId).getPos()
         a = carPos
         b = carPos + carDir
-        return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0 
+        return ((b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)) > 0 
     
     def getNextNodeIds(self, nodeId):
         if not nodeId in self.pathGraph: return []
@@ -59,6 +61,10 @@ class AgentGraph(object):
     def getRandomNode(self):
         id = random.choice(self.nodeMap.keys())
         return self.getNode(id)
+    
+    def getRandomStartNode(self):
+        nodeId = random.choice(self.startNodes)
+        return self.getNode(nodeId)
     
     def getNearestNode(self, pos):
         nearestId = None

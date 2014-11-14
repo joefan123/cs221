@@ -8,9 +8,15 @@ class Layout(object):
 
     def __init__(self, worldName):
         self.loadData(worldName)
-        self.agentGraph = AgentGraph(self.data['agentGraph'])
-        self.juniorGraph = AgentGraph(self.data['agentGraph'])
-        self.juniorGraph.add(self.data['juniorGraph'])
+        self.worldName = worldName
+        if worldName != 'highway':
+            self.agentGraph = AgentGraph(self.data['agentGraph'])
+            self.juniorGraph = AgentGraph(self.data['agentGraph'])
+            self.juniorGraph.add(self.data['juniorGraph'])
+        else:
+            self.agentGraphCarB = AgentGraph(self.data['agentGraphCarB'],self.data['agentCarBStarts'])
+            self.agentGraphTruck = AgentGraph(self.data['agentGraphTruck'],self.data['agentTruckStarts'])
+            self.juniorGraph = AgentGraph(self.data['juniorGraph'])
         self.assertValid()
         
     def loadData(self, worldName):
@@ -20,6 +26,9 @@ class Layout(object):
         layoutFile = open(layoutPath)
         self.data = json.load(layoutFile)
         layoutFile.close()
+        
+    def getWorldName(self):
+        return self.worldName
         
     def getAgentStart(self):
         return self.data['starts']
@@ -59,6 +68,18 @@ class Layout(object):
     
     def getAgentGraph(self):
         return self.agentGraph
+    
+    def getAgentGraphCarB(self):
+        return self.agentGraphCarB
+    
+    def getAgentCarBStarts(self):
+        return self.agentCarBStarts
+    
+    def getAgentGraphTruck(self):
+        return self.agentGraphTruck
+    
+    def getAgentTruckStarts(self):
+        return self.agentTruckStarts
     
     def getJuniorGraph(self):
         return self.juniorGraph
