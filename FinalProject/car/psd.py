@@ -21,6 +21,7 @@ def calcPSD(t1, accelA, speedA, speedB, carLengthA, carLengthB, clearanceAB, cle
     
 
 # http://www.webpages.uidaho.edu/niatt_labmanual/chapters/geometricdesign/exampleproblems/PassingSightDistance.htm
+print 'example 1'
 MPHtoMPS    = 0.44704   # miles per hour to meters per second
 METERtoFEET = 3.28084
 t1 = 2.5; accelA = 1.47*MPHtoMPS
@@ -30,11 +31,13 @@ clearanceAB = 20./METERtoFEET; clearanceBA = clearanceAB
 
 calcPSD(t1, accelA, speedA, speedB, carLengthA, carLengthB, clearanceAB, clearanceBA, verbose = True)
 
+print '-'*80
 # car
-t1 = 0.; accelA = 10.
-speedA = 16.; speedB = 15.
-carLengthA = 30.; carLengthB = carLengthA
-clearanceAB = 10.; clearanceBA = clearanceAB
+print 'example 2'
+t1 = 0.; accelA = 1.
+speedA = 2.; speedB = 1.
+carLengthA = 1.; carLengthB = carLengthA
+clearanceAB = 1.; clearanceBA = clearanceAB
 
 calcPSD(t1, accelA, speedA, speedB, carLengthA, carLengthB, clearanceAB, clearanceBA, verbose = True)
 
