@@ -13,6 +13,7 @@ class AgentGraph(object):
     
     def __init__(self, data, startNodes=None):
         self.nodeMap = {}
+        self.terminalNodeId = None
         self.pathGraph = {}
         self.loadNodes(data)
         self.loadPath(data)
@@ -84,6 +85,8 @@ class AgentGraph(object):
             node = Node(nodeDatum)
             nodeId = node.getId()
             self.nodeMap[nodeId] = node
+            if node.isTerminal():
+                self.terminalNodeId = nodeId
 
     def loadPath(self, data):
         pathData = data['edges']

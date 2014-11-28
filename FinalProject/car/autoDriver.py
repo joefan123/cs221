@@ -26,37 +26,65 @@ class AutoDriver(Junior):
         self.nodeId = None
         self.nextId = None
         self.nextNode = None
-        self.burnInIterations = 30
+        self.burnInIterations = 10
     
     # Funciton: Get Autonomous Actions
     # ---------------------
     # Given the current belief about where other cars are and a graph of how
     # one can driver around the world, chose a next action.
+
     def getAutonomousActions(self, beliefOfOtherCars, agentGraph):
+        
         # Don't start until after your burn in iterations have expired
         if self.burnInIterations > 0:
             self.burnInIterations -= 1
             return[]
+        actions = {}
         
-        # Chose a next node to drive towards. Note that you can ask
-        # a if its a terminal using node.isTerminal()
+        actions = self.Baseline(beliefOfOtherCars, agentGraph, actions)
+        return actions        
+        
+
+        
+#         # Chose a next node to drive towards. Note that you can ask
+#         # a if its a terminal using node.isTerminal()
+#         if self.nodeId == None:
+#             self.nodeId = agentGraph.getNearestNode(self.pos)
+#         if self.nextId == None:
+#             self.choseNextId(agentGraph)
+#         if agentGraph.atNode(self.nextId, self.pos):
+#             self.nodeId = self.nextId
+#             self.choseNextId(agentGraph)
+#           
+#         # given a next node, drive towards that node. Stop if you
+#         # are too close to another car
+#         print self.nextId
+#         goalPos = agentGraph.getNode(self.nextId).getPos()
+#         vectorToGoal = goalPos - self.pos
+#         wheelAngle = -vectorToGoal.get_angle_between(self.dir)
+#         driveForward = not self.isCloseToOtherCar(beliefOfOtherCars)
+#         actions = {
+#             Car.TURN_WHEEL: wheelAngle
+#         }
+#         if driveForward:
+#             actions[Car.DRIVE_FORWARD] = 1.0
+#         return actions
+
+
+    def Baseline(self, beliefOfOtherCars, agentGraph, actions):
         if self.nodeId == None:
             self.nodeId = agentGraph.getNearestNode(self.pos)
         if self.nextId == None:
-            self.choseNextId(agentGraph)
+            self.choseNextId_Baseline(agentGraph, beliefOfOtherCars)
         if agentGraph.atNode(self.nextId, self.pos):
             self.nodeId = self.nextId
-            self.choseNextId(agentGraph)
-          
-        # given a next node, drive towards that node. Stop if you
-        # are too close to another car
+            self.choseNextId_Baseline(agentGraph, beliefOfOtherCars)
         goalPos = agentGraph.getNode(self.nextId).getPos()
         vectorToGoal = goalPos - self.pos
         wheelAngle = -vectorToGoal.get_angle_between(self.dir)
         driveForward = not self.isCloseToOtherCar(beliefOfOtherCars)
         actions = {
-            Car.TURN_WHEEL: wheelAngle
-        }
+            Car.TURN_WHEEL:wheelAngle}
         if driveForward:
             actions[Car.DRIVE_FORWARD] = 1.0
         return actions
@@ -67,20 +95,33 @@ class AutoDriver(Junior):
     # there is a car in the spot where we are about to drive. 
     def isCloseToOtherCar(self, beliefOfOtherCars):
         newBounds = []
-        offset = self.dir.normalized() * 1.5 * Car.LENGTH
+        # The multiplier was 1.5
+        offset = self.dir.normalized() * 1 * Car.LENGTH
         newPos = self.pos + offset
         row = util.yToRow(newPos.y)
         col = util.xToCol(newPos.x)
         p = beliefOfOtherCars.getProb(row, col)
+        # print 'row:{0} col:{1} prob:{2}'.format(row,col,p);
+        return p > AutoDriver.MIN_PROB
+    
+    def isCarAtNode(self, beliefOfOtherCars, pos):
+        row = util.yToRow(pos.y)
+        col = util.xToCol(pos.x)
+        p = beliefOfOtherCars.getProb(row, col)
+        # print 'row:{0} col:{1} prob:{2}'.format(row,col,p);
         return p > AutoDriver.MIN_PROB
     
     # Funciton: Chose Next Id
     # ---------------------
     # You have arrived at self.nodeId. Chose a next node to drive
     # towards.
-    def choseNextId(self, agentGraph):
+    def choseNextId_Baseline(self, agentGraph, beliefOfOtherCars):
         nextIds = agentGraph.getNextNodeIds(self.nodeId)
+        print 'nodeId:{0} nextIds:{1}'.format(self.nodeId, nextIds)
         if nextIds == []: 
             self.nextId = None
         else:
-            self.nextId = random.choice(nextIds)
+            self.nextId = nextIds[0]
+            if self.isCarAtNode(beliefOfOtherCars, agentGraph.getNode(self.nextId).getPos()):
+                self.nextId = nextIds[1]
+        print 'nextId:{0}'.format(self.nextId)

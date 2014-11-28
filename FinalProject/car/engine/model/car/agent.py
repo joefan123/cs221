@@ -13,8 +13,8 @@ import random
 
 class Agent(Car):
     
-    ACCELERATION = 10.0
-    MAX_SPEED_STD = 2.0
+    ACCELERATION = 7.0
+    MAX_SPEED_STD = 1.0
     
     colorCounter = 0
     

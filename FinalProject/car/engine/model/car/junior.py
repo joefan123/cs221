@@ -10,12 +10,12 @@ class Junior(Car):
     LEFT_KEY = 'Left'
     RIGHT_KEY = 'Right'
     
-    ACCELERATION = 1.4
+    ACCELERATION = 20.0
     FRICTION = 1.0
     WHEEL_TURN = 2.0
     WHEEL_TURN_HUMAN = 1.0
     MAX_WHEEL_ANGLE = 10.0
-    MAX_SPEED = 5.0
+    MAX_SPEED = 10.0
     
     def setup(self, pos, direction, velocity):
         Car.__init__(self, pos, direction, velocity)
