@@ -12,6 +12,7 @@ import sys
 import optparse
 import random
 import signal
+from QLearning import QLearningAlgorithm
 
 def signal_handler(signal, frame):
     Display.raiseEndGraphics()
@@ -43,11 +44,11 @@ if __name__ == '__main__':
 
     # Fix the random seed
     if options.fixedSeed: random.seed('driverlessCar')
-
-    controller = Controller()
-    quit = controller.drive()
-    if not quit:
-        controller.freezeFrame()
-    
-    print 'closing...'
-    Display.endGraphics()
+    QLearner = QLearningAlgorithm([0,1])
+    for i in range(10):
+        controller = Controller(QLearner)
+        quit = controller.drive()
+        if not quit:
+            controller.freezeFrame()
+        print 'closing...'
+        Display.endGraphics()

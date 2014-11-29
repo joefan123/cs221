@@ -50,7 +50,7 @@ class Junior(Car):
                 actions.append(Car.TURN_RIGHT)
         return actions
     
-    def autonomousAction(self, beliefs, agentGraph):
+    def autonomousAction(self, beliefs, agentGraph):       
         oldPos = Vec2d(self.pos.x, self.pos.y)
         oldDir = Vec2d(self.dir.x, self.dir.y)
         oldVel = Vec2d(self.velocity.x, self.velocity.y)
@@ -81,5 +81,8 @@ class Junior(Car):
             self.turnLeft(Junior.WHEEL_TURN)
         if turnRight:
             self.turnRight(Junior.WHEEL_TURN)
+            
+    def incorporateReward(self, reward, beliefs):
+        self.incorporateRewardInQLearn(reward, beliefs)
         
         

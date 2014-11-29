@@ -15,10 +15,10 @@ import traceback
 
 class Controller(object):
     
-    def __init__(self):
+    def __init__(self, QLearner):
         self.layout = Layout(Const.WORLD)
         Display.initGraphics(self.layout)
-        self.model = Model(self.layout)
+        self.model = Model(self.layout, QLearner)
         self.carChanges = {}
         self.errorCounter = Counter()
         self.consecutiveLate = 0
@@ -57,7 +57,8 @@ class Controller(object):
         self.userThread.stop()
         Display.graphicsSleep(0.1)
         self.userThread.join()
-        return self.userThread.quit
+#         return self.userThread.quit
+        return True
         
     def freezeFrame(self):
         while True:
@@ -210,7 +211,7 @@ class Controller(object):
             
     def calculateError(self):
         if self.isLearning: return
-        #if Const.INFERENCE == 'none': return
+        # if Const.INFERENCE == 'none': return
         if len(self.model.getOtherCars()) == 0: return
         errors = []
         for car in self.model.getOtherCars():

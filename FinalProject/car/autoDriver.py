@@ -22,11 +22,15 @@ class AutoDriver(Junior):
     # ---------------------
     # Create an autonomous driver. Give it a number of heartBeats to wait before
     # it starts to drive
-    def __init__(self):
+    def __init__(self, QLearner):
         self.nodeId = None
         self.nextId = None
         self.nextNode = None
         self.burnInIterations = 10
+        
+        self.QLearner = QLearner
+        self.prevState = None
+        self.prevActionIndex = None
     
     # Funciton: Get Autonomous Actions
     # ---------------------
@@ -37,41 +41,46 @@ class AutoDriver(Junior):
         
         # Don't start until after your burn in iterations have expired
         if self.burnInIterations > 0:
-            self.burnInIterations -= 1
             return[]
-        actions = {}
         
-        actions = self.Baseline(beliefOfOtherCars, agentGraph, actions)
-        return actions        
+        # actions = self.Baseline(beliefOfOtherCars, agentGraph)
+        actions = self.QLearn(beliefOfOtherCars, agentGraph)
+        return actions
+    
+    def incorporateRewardInQLearn(self, reward, beliefOfOtherCars):
+        if self.burnInIterations > 0:
+            self.burnInIterations -= 1
+            return
         
-
+        newState = self.formState(beliefOfOtherCars)
+        self.QLearner.incorporateFeedback(self.prevState, self.prevActionIndex, reward, newState)
         
-#         # Chose a next node to drive towards. Note that you can ask
-#         # a if its a terminal using node.isTerminal()
-#         if self.nodeId == None:
-#             self.nodeId = agentGraph.getNearestNode(self.pos)
-#         if self.nextId == None:
-#             self.choseNextId(agentGraph)
-#         if agentGraph.atNode(self.nextId, self.pos):
-#             self.nodeId = self.nextId
-#             self.choseNextId(agentGraph)
-#           
-#         # given a next node, drive towards that node. Stop if you
-#         # are too close to another car
-#         print self.nextId
-#         goalPos = agentGraph.getNode(self.nextId).getPos()
-#         vectorToGoal = goalPos - self.pos
-#         wheelAngle = -vectorToGoal.get_angle_between(self.dir)
-#         driveForward = not self.isCloseToOtherCar(beliefOfOtherCars)
-#         actions = {
-#             Car.TURN_WHEEL: wheelAngle
-#         }
-#         if driveForward:
-#             actions[Car.DRIVE_FORWARD] = 1.0
-#         return actions
+#         print 'weights={0}'.format(self.QLearner.weights)
+            
+    def QLearn(self, beliefOfOtherCars, agentGraph):
+        
+        if self.nodeId == None:
+            self.nodeId = agentGraph.getNearestNode(self.pos)
+        if self.nextId != None and agentGraph.atNode(self.nextId, self.pos):
+            self.nodeId = self.nextId
+            
+        state = self.formState(beliefOfOtherCars)
+        self.prevState = state
+        nodeIndex = self.QLearner.getAction(state)
+#         print 'nodeIndex={0}'.format(nodeIndex)
+        self.prevActionIndex = nodeIndex
+        nextIds = agentGraph.getNextNodeIds(self.nodeId)
+#         print 'nodeId:{0} nextIds:{1}'.format(self.nodeId, nextIds)
+        self.nextId = nextIds[nodeIndex]
+#         print 'nextId={0}'.format(self.nextId)
+        
+        actions = self.GetActionsForNodeId(beliefOfOtherCars, agentGraph, self.nextId)
+        return actions
+         
+    def formState(self, beliefOfOtherCars):
+        return (self.nodeId, self.getProbAtPos(beliefOfOtherCars, self.pos))
 
-
-    def Baseline(self, beliefOfOtherCars, agentGraph, actions):
+    def Baseline(self, beliefOfOtherCars, agentGraph):
         if self.nodeId == None:
             self.nodeId = agentGraph.getNearestNode(self.pos)
         if self.nextId == None:
@@ -79,12 +88,15 @@ class AutoDriver(Junior):
         if agentGraph.atNode(self.nextId, self.pos):
             self.nodeId = self.nextId
             self.choseNextId_Baseline(agentGraph, beliefOfOtherCars)
-        goalPos = agentGraph.getNode(self.nextId).getPos()
+        actions = self.GetActionsForNodeId(beliefOfOtherCars, agentGraph, self.nextId)
+        return actions
+    
+    def GetActionsForNodeId(self, beliefOfOtherCars, agentGraph, nodeId):
+        goalPos = agentGraph.getNode(nodeId).getPos()
         vectorToGoal = goalPos - self.pos
         wheelAngle = -vectorToGoal.get_angle_between(self.dir)
         driveForward = not self.isCloseToOtherCar(beliefOfOtherCars)
-        actions = {
-            Car.TURN_WHEEL:wheelAngle}
+        actions = {Car.TURN_WHEEL:wheelAngle}
         if driveForward:
             actions[Car.DRIVE_FORWARD] = 1.0
         return actions
@@ -104,12 +116,16 @@ class AutoDriver(Junior):
         # print 'row:{0} col:{1} prob:{2}'.format(row,col,p);
         return p > AutoDriver.MIN_PROB
     
-    def isCarAtNode(self, beliefOfOtherCars, pos):
+    def isCarAtPos(self, beliefOfOtherCars, pos):
+        p = self.getProbAtPos(beliefOfOtherCars, pos)
+        # print 'row:{0} col:{1} prob:{2}'.format(row,col,p);
+        return p > AutoDriver.MIN_PROB
+    
+    def getProbAtPos(self, beliefOfOtherCars, pos):
         row = util.yToRow(pos.y)
         col = util.xToCol(pos.x)
         p = beliefOfOtherCars.getProb(row, col)
-        # print 'row:{0} col:{1} prob:{2}'.format(row,col,p);
-        return p > AutoDriver.MIN_PROB
+        return p
     
     # Funciton: Chose Next Id
     # ---------------------

@@ -14,14 +14,14 @@ import random
 
 class Model(object):
 
-    def __init__(self, layout):
+    def __init__(self, layout, QLearner):
         self._initBlocks(layout)
         self._initIntersections(layout)
         self.layout = layout
         startX = layout.getStartX()
         startY = layout.getStartY()
         startDirName = layout.getJuniorDir()
-        self.junior = AutoDriver()
+        self.junior = AutoDriver(QLearner)
         self.junior.setup(
             Vec2d(startX, startY),
             startDirName,

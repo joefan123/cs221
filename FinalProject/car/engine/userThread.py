@@ -55,10 +55,17 @@ class UserThread(threading.Thread):
         self.junior.update()
         self.collision = self.model.checkCollision(self.junior)
         self.victory = self.model.checkVictory()
+        if carProb and Const.AUTO:
+            self.junior.incorporateReward(self.getReward(self.victory),carProb)
         newPos = self.junior.getPos()
         newDir = self.junior.getDir()
         deltaPos = newPos - oldPos
         deltaAngle = oldDir.get_angle_between(newDir)
         Display.move(self.junior, deltaPos)
         Display.rotate(self.junior, deltaAngle)
+    
+    def getReward(self, isVictory):
+        if isVictory:
+            return 100
+        return 0
         
