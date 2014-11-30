@@ -23,7 +23,8 @@ Chris Piech (piech@cs.stanford.edu). It was inspired by the Pacman projects.
 '''
 
 from engine.const import Const
-import cPickle as pickle
+#import cPickle as pickle
+import pickle
 import math
 import os.path
 import random
