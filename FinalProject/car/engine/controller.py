@@ -54,11 +54,12 @@ class Controller(object):
             self.iteration += 1
         if not self.userThread.quit and not self.isLearning:
             self.outputGameResult()
+            isWin=not self.userThread.hasCollided()
         self.userThread.stop()
         Display.graphicsSleep(0.1)
         self.userThread.join()
 #         return self.userThread.quit
-        return True
+        return (True, isWin)
         
     def freezeFrame(self):
         while True:

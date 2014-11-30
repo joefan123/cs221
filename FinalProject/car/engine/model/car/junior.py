@@ -82,7 +82,7 @@ class Junior(Car):
         if turnRight:
             self.turnRight(Junior.WHEEL_TURN)
             
-    def incorporateReward(self, reward, beliefs):
-        self.incorporateRewardInQLearn(reward, beliefs)
+    def incorporateReward(self, reward, beliefs, agentGraph):
+        self.incorporateRewardInQLearn(reward, beliefs, agentGraph)
         
         

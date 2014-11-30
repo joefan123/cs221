@@ -44,11 +44,18 @@ if __name__ == '__main__':
 
     # Fix the random seed
     if options.fixedSeed: random.seed('driverlessCar')
-    QLearner = QLearningAlgorithm([0,1])
-    for i in range(10):
+    QLearner = QLearningAlgorithm([0, 1])
+    winCount = 0
+    for i in range(100):
         controller = Controller(QLearner)
-        quit = controller.drive()
+        (quit, isWin) = controller.drive()
         if not quit:
             controller.freezeFrame()
         print 'closing...'
         Display.endGraphics()
+        if isWin:
+            winCount += 1
+        if i % 10 == 0:
+            print 'iteration={0}'.format(i)
+            print QLearner.weights
+    print 'winCount={0}'.format(winCount)

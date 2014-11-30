@@ -310,12 +310,14 @@
             {
                 "id": 62,
                 "pos": [90, 60],
-                "dir": "north"
+                "dir": "north",
+                "penUltimate": true
             },
             {
                 "id": 63,
                 "pos": [30, 60],
-                "dir": "north"
+                "dir": "north",
+                "penUltimate": true
             },
             {
                 "id": 64,

@@ -17,6 +17,7 @@ class Node(object):
         self.x = pos[0]
         self.y = pos[1]
         self.terminal = 'terminal' in nodeData
+        self.penUltimate = 'penUltimate' in nodeData
         
     def getId(self):
         return self.id
@@ -29,6 +30,9 @@ class Node(object):
     
     def isTerminal(self):
         return self.terminal
+    
+    def isPenUltimate(self):
+        return self.penUltimate
     
     def getDist(self, pos):
         dx = self.x - pos.x

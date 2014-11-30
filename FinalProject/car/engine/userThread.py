@@ -56,7 +56,7 @@ class UserThread(threading.Thread):
         self.collision = self.model.checkCollision(self.junior)
         self.victory = self.model.checkVictory()
         if carProb and Const.AUTO:
-            self.junior.incorporateReward(self.getReward(self.victory),carProb)
+            self.junior.incorporateReward(self.getReward(self.victory, self.collision),carProb, agentGraph)
         newPos = self.junior.getPos()
         newDir = self.junior.getDir()
         deltaPos = newPos - oldPos
@@ -64,8 +64,10 @@ class UserThread(threading.Thread):
         Display.move(self.junior, deltaPos)
         Display.rotate(self.junior, deltaAngle)
     
-    def getReward(self, isVictory):
+    def getReward(self, isVictory, isCollision):
         if isVictory:
             return 100
+        if isCollision:
+            return -200
         return 0
         

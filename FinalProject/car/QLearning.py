@@ -14,8 +14,12 @@ class QLearningAlgorithm():
         self.weights = collections.Counter()
         self.numIters = 0
 
+    def getPossibleActions(self, state):
+        if state[1]:
+            return [0]
+        return self.actions
+        
     # Return the Q function associated with the weights and features
-
     def getQ(self, state, action):
         score = 0
         for (f, v) in self.featureExtractor(state, action):
@@ -29,12 +33,14 @@ class QLearningAlgorithm():
     def getAction(self, state):
         self.numIters += 1
         if random.random() < self.explorationProb:
-            return random.choice(self.actions)
+            return random.choice(self.getPossibleActions(state))
         else:
             possibleQValAndActions = [(self.getQ(state, action), action) for action in
-                       self.actions]
+                       self.getPossibleActions(state)]
 #             print 'possibleQValAndActions={0}'.format(possibleQValAndActions)
-            if possibleQValAndActions[0][0]==possibleQValAndActions[1][0]:
+            if len(possibleQValAndActions) == 1:
+                return possibleQValAndActions[0][1]
+            if possibleQValAndActions[0][0] == possibleQValAndActions[1][0]:
                 return random.choice(self.actions)
             return max(possibleQValAndActions)[1]
 
@@ -70,6 +76,13 @@ class QLearningAlgorithm():
 def featureExtractor(state, action):
     featureList = []
     featureList.append((state[0], 1))
-    featureList.append((state[1], 1))
+#     featureList.append((state[1], 1))
+#     featureList.append((state[2], 1))
+    if state[2]<0.33:
+        featureList.append(('0.33', 1))
+    elif state[2]<0.66:
+        featureList.append(('0.66', 1))
+    else:
+        featureList.append(('1.00', 1))
     featureList.append((action, 1))
     return featureList
